@@ -20,12 +20,12 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Jeu du Pendu"),
+        title: Text("Deyizark_Hangman"),
         centerTitle: true,
       ),
       body: Center(
         child: ElevatedButton(
-          child: Text("Commencer le jeu"),
+          child: Text("Kòmanse Jwe..."),
           onPressed: () {
             Navigator.push(
               context,
@@ -47,14 +47,20 @@ class _GameScreenState extends State<GameScreen> {
   final List<Map<String, String>> words = [
     {"word": "BONJOU", "hint": "Mo pou salye moun"},
     {"word": "DART", "hint": "Langaj Flutter itilize"},
-    {"word": "FLUTTER", "hint": "Framework pou app mobil"},
+    {"word": "FLUTTER", "hint": "Framework pou apk mobil"},
+    {"word": "VARYAB", "hint": "Espas pou estoke done nan pwogram"},
+    {"word": "FONKSYON", "hint": "Blòk kòd ki fè yon travay presi"},
+    {"word": "WIDJET", "hint": "Eleman bazik nan Flutter"},
+    {"word": "PYTHON", "hint": "Langaj pwogramasyon popilè bokouu"},
+    {"word": "BACKUP", "hint": "Sovgad nan mitan pwojè"},
+    {"word": "ESIH", "hint": "It's not easy"},
   ];
 
-  String secretWord = "";
+  String moSekre = "";
   String hint = "";
-  List<String> hiddenWord = [];
-  int chances = 5;
-  List<String> usedLetters = [];
+  List<String> moKache = [];
+  int chans = 5;
+  List<String> letDejaItilize = [];
   final _random = Random();
 
   @override
@@ -65,37 +71,42 @@ class _GameScreenState extends State<GameScreen> {
 
   void startGame() {
     final wordData = words[_random.nextInt(words.length)];
-    secretWord = wordData["word"]!;
+    moSekre = wordData["word"]!;
     hint = wordData["hint"]!;
-    hiddenWord = List.generate(secretWord.length, (_) => "*");
-    chances = 5;
-    usedLetters = [];
+    moKache = List.generate(moSekre.length, (_) => "*");
+    chans = 5;
+    letDejaItilize = [];
     setState(() {});
   }
 
-  void checkLetter(String letter) {
-    if (usedLetters.contains(letter)) return;
+  void checkLetter(String let) {
+    if (letDejaItilize.contains(let)) return;
 
     setState(() {
-      usedLetters.add(letter);
+      letDejaItilize.add(let);
 
-      if (secretWord.contains(letter)) {
-        for (int i = 0; i < secretWord.length; i++) {
-          if (secretWord[i] == letter) hiddenWord[i] = letter;
+      if (moSekre.contains(let)) {
+        for (int i = 0; i < moSekre.length; i++) {
+          if (moSekre[i] == let) {
+            moKache[i] = let;
+          }
         }
       } else {
-        chances--;
+        chans--;
       }
     });
 
-    if (!hiddenWord.contains("*")) goToResult(true);
-    else if (chances == 0) goToResult(false);
+    if (!moKache.contains("*")) {
+      goToResult(true);
+    } else if (chans == 0) {
+      goToResult(false);
+    }
   }
 
-  void goToResult(bool win) {
+  void goToResult(bool genyen) {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => ResultScreen(win: win)),
+      MaterialPageRoute(builder: (_) => ResultScreen(genyen: genyen)),
     );
   }
 
@@ -112,7 +123,7 @@ class _GameScreenState extends State<GameScreen> {
               children: [
                 Icon(Icons.star, color: Colors.yellow),
                 SizedBox(width: 4),
-                Text("$chances", style: TextStyle(fontSize: 18)),
+                Text("$chans", style: TextStyle(fontSize: 18)),
               ],
             ),
           ),
@@ -122,9 +133,15 @@ class _GameScreenState extends State<GameScreen> {
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
-            Text(hint, style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic)),
+            Text(
+              hint,
+              style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
+            ),
             SizedBox(height: 20),
-            Text(hiddenWord.join(" "), style: TextStyle(fontSize: 32, letterSpacing: 2)),
+            Text(
+              moKache.join(" "),
+              style: TextStyle(fontSize: 32, letterSpacing: 2),
+            ),
             SizedBox(height: 20),
             Expanded(child: buildKeyboard()),
           ],
@@ -133,9 +150,6 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  // =======================
-  // RESPONSIVE QWERTY KEYBOARD
-  // =======================
   Widget buildKeyboard() {
     const row1 = ["Q","W","E","R","T","Y","U","I","O","P"];
     const row2 = ["A","S","D","F","G","H","J","K","L"];
@@ -153,18 +167,20 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  Widget buildKeyboardRow(List<String> letters) {
+  Widget buildKeyboardRow(List<String> letYo) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: letters.map((letter) {
+      children: letYo.map((let) {
         return Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 2),
             child: ElevatedButton(
-              onPressed: usedLetters.contains(letter) ? null : () => checkLetter(letter),
-              child: Text(letter),
+              onPressed: letDejaItilize.contains(let)
+                  ? null
+                  : () => checkLetter(let),
+              child: Text(let),
               style: ElevatedButton.styleFrom(
-                minimumSize: Size(0, 50), // lajè adapte otomatik
+                minimumSize: Size(0, 50),
                 padding: EdgeInsets.zero,
               ),
             ),
@@ -175,12 +191,9 @@ class _GameScreenState extends State<GameScreen> {
   }
 }
 
-// =======================
-// RESULT SCREEN
-// =======================
 class ResultScreen extends StatelessWidget {
-  final bool win;
-  const ResultScreen({required this.win});
+  final bool genyen;
+  const ResultScreen({required this.genyen});
 
   @override
   Widget build(BuildContext context) {
@@ -189,8 +202,10 @@ class ResultScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(win ? "🎉 Ou Genyen !" : "❌ Ou Pèdi",
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+            Text(
+              genyen ? "BRAVO! Ou Genyen :)" : "Woy! Ou Pèdi",
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+            ),
             SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
