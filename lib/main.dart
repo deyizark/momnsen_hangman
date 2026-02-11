@@ -121,9 +121,9 @@ class _GameScreenState extends State<GameScreen> {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                Icon(Icons.star, color: Colors.yellow),
-                SizedBox(width: 4),
                 Text("$chans", style: TextStyle(fontSize: 18)),
+                SizedBox(width: 4),
+                Icon(Icons.favorite, color: Colors.red),
               ],
             ),
           ),
@@ -134,13 +134,14 @@ class _GameScreenState extends State<GameScreen> {
         child: Column(
           children: [
             Text(
-              hint,
-              style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
-            ),
-            SizedBox(height: 20),
-            Text(
               moKache.join(" "),
               style: TextStyle(fontSize: 32, letterSpacing: 2),
+            ),
+            SizedBox(height: 10),
+            Text(
+              hint,
+              style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+              textAlign: TextAlign.center,
             ),
             SizedBox(height: 20),
             Expanded(child: buildKeyboard()),
@@ -158,35 +159,38 @@ class _GameScreenState extends State<GameScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        buildKeyboardRow(row1),
-        SizedBox(height: 5),
-        buildKeyboardRow(row2),
-        SizedBox(height: 5),
-        buildKeyboardRow(row3),
+        buildKeyboardRow(row1, 1),
+        SizedBox(height: 6),
+        buildKeyboardRow(row2, 0.9),
+        SizedBox(height: 6),
+        buildKeyboardRow(row3, 0.8),
       ],
     );
   }
 
-  Widget buildKeyboardRow(List<String> letYo) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: letYo.map((let) {
-        return Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 2),
-            child: ElevatedButton(
-              onPressed: letDejaItilize.contains(let)
-                  ? null
-                  : () => checkLetter(let),
-              child: Text(let),
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(0, 50),
-                padding: EdgeInsets.zero,
+  Widget buildKeyboardRow(List<String> letters, double widthFactor) {
+    return FractionallySizedBox(
+      widthFactor: widthFactor,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: letters.map((let) {
+          return Flexible(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: ElevatedButton(
+                onPressed: letDejaItilize.contains(let)
+                    ? null
+                    : () => checkLetter(let),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(double.infinity, 48),
+                  padding: EdgeInsets.zero,
+                ),
+                child: Text(let),
               ),
             ),
-          ),
-        );
-      }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 }
